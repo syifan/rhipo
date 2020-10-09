@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "vector": "cpp"
+    },
+    "editor.formatOnSave": true,
+    "cpplint.excludes": [
+        "include/",
+    ],
+    "cpplint.filters": [
+        "-legal/copyright"
+    ],
+    "clang-format.fallbackStyle": "Google",
+    "clang-format.executable": "/usr/bin/clang-format",
+    "cmake.configureOnOpen": true
+}
