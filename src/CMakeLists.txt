@@ -8,6 +8,8 @@ endforeach (DIR)
 
 # The library that is shared by the driver and runtime implementation
 set(SRC
+    client.h
+    client.cc
     curl.h
     curl.cc
     device.cc

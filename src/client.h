@@ -1,9 +1,12 @@
 #ifndef SRC_CLIENT_H_
 #define SRC_CLIENT_H_
 
+#include "src/curl.h"
+
 class Client {
- private:
-  Curl Curl
+ public:
+  static Client instance;
+  Curl Curl;
 };
 
 #endif  // SRC_CLIENT_H_

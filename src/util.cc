@@ -1,6 +1,6 @@
 #include "src/util.h"
 
 void panic(const std::string &msg) {
-  std::cerr << msg << std::endl;
+  printf("Panic: %s\n", msg.c_str());
   exit(1);
 }
