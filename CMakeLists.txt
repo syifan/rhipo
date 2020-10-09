@@ -5,6 +5,8 @@ project(rhipo)
 # Include other files
 list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake")
+message(${CMAKE_MODULE_PATH})
+include(curl)
 
 # Enable C++ 11
 # ADD_DEFINITIONS(-std=gnu11)

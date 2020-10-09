@@ -8,15 +8,19 @@ endforeach (DIR)
 
 # The library that is shared by the driver and runtime implementation
 set(SRC
+    curl.h
+    curl.cc
     device.cc
     internal.h
     internal.cc
     kernel.cc
     memory.cc
-    util.h)
+    util.h
+    util.cc)
 add_library(client STATIC ${SRC})
 add_library(amdhip64 SHARED ${SRC})
 set_target_properties(amdhip64
     PROPERTIES VERSION 3)
 set_property(TARGET client
     PROPERTY COMPILE_FLAGS "-fPIC")
+target_link_libraries(amdhip64 ${CURL_LIBRARIES})
