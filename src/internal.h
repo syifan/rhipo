@@ -7,6 +7,37 @@
 #include <utility>
 #include <vector>
 
+// hip-clang fatbin format
+constexpr unsigned __hipFatMAGIC2 = 0x48495046;  // "HIPF"
+
+#define CLANG_OFFLOAD_BUNDLER_MAGIC "__CLANG_OFFLOAD_BUNDLE__"
+#define AMDGCN_AMDHSA_TRIPLE "hip-amdgcn-amd-amdhsa"
+
+struct __ClangOffloadBundleDesc {
+  uint64_t offset;
+  uint64_t size;
+  uint64_t tripleSize;
+  const char triple[1];
+
+  const struct __ClangOffloadBundleDesc* next() const {
+    return reinterpret_cast<const struct __ClangOffloadBundleDesc*>(triple +
+                                                                    tripleSize);
+  }
+};
+
+struct __ClangOffloadBundleHeader {
+  const char magic[sizeof(CLANG_OFFLOAD_BUNDLER_MAGIC) - 1];
+  uint64_t numBundles;
+  __ClangOffloadBundleDesc desc[1];
+};
+
+struct __CudaFatBinaryWrapper {
+  unsigned int magic;
+  unsigned int version;
+  __ClangOffloadBundleHeader* binary;
+  void* unused;
+};
+
 struct ihipModule_t {
   std::string fileName;
   hsa_executable_t executable = {};

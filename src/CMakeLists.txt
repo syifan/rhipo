@@ -12,7 +12,8 @@ set(SRC
     internal.h
     internal.cc
     kernel.cc
-    memory.cc)
+    memory.cc
+    util.h)
 add_library(client STATIC ${SRC})
 add_library(amdhip64 SHARED ${SRC})
 set_target_properties(amdhip64
