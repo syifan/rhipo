@@ -20,6 +20,8 @@ include_directories(${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+add_definitions(-D__HIP_PLATFORM_HCC__)
+
 # Include sub directories
 set(SUB_DIRS src)
 foreach (DIR ${SUB_DIRS})

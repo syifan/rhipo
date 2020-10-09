@@ -8,8 +8,11 @@ endforeach (DIR)
 
 # The library that is shared by the driver and runtime implementation
 set(SRC
+    device.cc
     internal.h
-    internal.cc)
+    internal.cc
+    kernel.cc
+    memory.cc)
 add_library(client STATIC ${SRC})
 add_library(amdhip64 SHARED ${SRC})
 set_target_properties(amdhip64
