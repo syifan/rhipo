@@ -26,7 +26,6 @@ nlohmann::json Curl::Get(const std::string &url, const nlohmann::json &params) {
   std::string rsp;
 
   auto full_url = this->url + url;
-  std::cout << "req: " << full_url << std::endl;
 
   curl_easy_setopt(this->curl, CURLOPT_URL, full_url.c_str());
   // curl_easy_setopt(this->curl, CURLOPT_HTTPGET, 1L);
@@ -34,7 +33,6 @@ nlohmann::json Curl::Get(const std::string &url, const nlohmann::json &params) {
   curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, &rsp);
 
   curl_easy_perform(this->curl);
-  std::cout << "rsp: " << rsp << std::endl;
 
   return nlohmann::json::parse(rsp);
 }
