@@ -83,6 +83,11 @@ extern "C" void __hipRegisterFunction(
   printf("%s\n", __PRETTY_FUNCTION__);
 }
 
+extern "C" void __hipUnregisterFatBinary(
+    std::vector<std::pair<hipModule_t, bool> >* modules) {
+  printf("%s\n", __PRETTY_FUNCTION__);
+}
+
 extern "C" hipError_t __hipPushCallConfiguration(dim3 gridDim, dim3 blockDim,
                                                  size_t sharedMem,
                                                  hipStream_t stream) {

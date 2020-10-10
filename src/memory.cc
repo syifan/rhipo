@@ -38,9 +38,9 @@ hipError_t memcopyD2H(void* dst, const void* src, size_t sizeBytes) {
   param["ptr"] = reinterpret_cast<uintptr_t>(src);
   param["size"] = sizeBytes;
 
-  auto rsp = Client::instance.Curl.Post("/memcopy_h2d", param);
+  auto rsp = Client::instance.Curl.Get("/memcopy_d2h", param);
 
-  auto b64_data = rsp.get<std::string>();
+  auto b64_data = rsp["data"].get<std::string>();
   auto raw_data = base64_decode(b64_data);
 
   memcpy(dst, raw_data.c_str(), sizeBytes);
