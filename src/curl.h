@@ -13,6 +13,7 @@ class Curl {
   ~Curl();
 
   nlohmann::json Get(const std::string& url, const nlohmann::json& params);
+  nlohmann::json Post(const std::string& url, const nlohmann::json& params);
 
  private:
   CURL* curl;

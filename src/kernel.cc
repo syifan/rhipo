@@ -7,8 +7,3 @@ hipError_t hipLaunchKernel(const void* func_addr, dim3 numBlocks,
   printf("%s\n", __PRETTY_FUNCTION__);
   return hipSuccess;
 }
-
-hipError_t hipFree(void* ptr) {
-  printf("%s\n", __PRETTY_FUNCTION__);
-  return hipSuccess;
-}

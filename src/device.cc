@@ -1,13 +1,13 @@
 #include <hip/hip_runtime.h>
+
 #include <iostream>
 #include <string>
 
+#include <nlohmann/json.hpp>
 #include "src/client.h"
 
 hipError_t hipGetDeviceCount(int* count) {
-  printf("%s\n", __PRETTY_FUNCTION__);
-
-  nlohmann::json param;
+  nlohmann::json param = nlohmann::json::object();
   auto rsp = Client::instance.Curl.Get("/device_count", param);
 
   *count = rsp["device_count"];
@@ -16,9 +16,7 @@ hipError_t hipGetDeviceCount(int* count) {
 }
 
 hipError_t hipGetDeviceProperties(hipDeviceProp_t* props, int device) {
-  printf("%s\n", __PRETTY_FUNCTION__);
-
-  nlohmann::json param;
+  nlohmann::json param = nlohmann::json::object();
   auto rsp = Client::instance.Curl.Get(
       "/device_properties/" + std::to_string(device), param);
 

@@ -1,9 +1,21 @@
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>
+#include <atomic>
+#include <fstream>
 #include <vector>
 
 #include "src/internal.h"
 #include "src/util.h"
+
+void __hipDumpCodeObject(const std::string& image) {
+  char fname[30];
+  static std::atomic<int> index;
+  snprintf(fname, sizeof(fname), "__hip_dump_code_object%04d.o", index++);
+  std::ofstream ofs;
+  ofs.open(fname, std::ios::binary);
+  ofs << image;
+  ofs.close();
+}
 
 extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
   hipError_t err;
@@ -21,8 +33,15 @@ extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
     return nullptr;
   }
 
+  int device_count = 0;
+  err = hipGetDeviceCount(&device_count);
+  if (err != hipSuccess) {
+    panic("cannot get device count.");
+  }
+
   const __ClangOffloadBundleDesc* desc = &header->desc[0];
 
+  auto modules = new std::vector<hipModule_t>(device_count);
   for (uint64_t i = 0; i < header->numBundles; i++, desc = desc->next()) {
     printf("%lu\n", i);
     printf("%s\n", desc->triple);
@@ -36,22 +55,25 @@ extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
                        desc->tripleSize - sizeof(AMDGCN_AMDHSA_TRIPLE)};
     printf("Found bundle for %s\n", target.c_str());
 
-    int device_count = 0;
-    err = hipGetDeviceCount(&device_count);
-    if (err != hipSuccess) {
-      panic("cannot get device count.");
-    }
-
     for (int device_id = 1; device_id <= device_count; device_id++) {
       struct hipDeviceProp_t device_prop;
       err = hipGetDeviceProperties(&device_prop, device_id);
       if (err != hipSuccess) {
         panic("cannot get device properties.");
       }
+
+      ihipModule_t* module = new ihipModule_t;
+
+      std::string image{reinterpret_cast<const char*>(
+                            reinterpret_cast<uintptr_t>(header) + desc->offset),
+                        desc->size};
+      __hipDumpCodeObject(image);
+
+      modules->at(device_id - 1) = module;
     }
   }
 
-  return nullptr;
+  return modules;
 }
 
 extern "C" void __hipRegisterFunction(
