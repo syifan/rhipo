@@ -38,8 +38,45 @@ struct __CudaFatBinaryWrapper {
   void* unused;
 };
 
+struct HSACodeObjectHeader {
+  uint32_t code_version_major;
+  uint32_t code_version_minor;
+  uint16_t machine_kind;
+  uint16_t machine_version_major;
+  uint16_t machine_version_minor;
+  uint16_t machine_version_stepping;
+  uint64_t kernel_code_entry_byte_offset;
+  uint64_t kernel_code_prefetch_byte_offset;
+  uint64_t kernel_code_prefetch_byte_size;
+  uint64_t max_scratch_backing_memory_byte_size;
+  uint32_t compute_pgm_rsrc_1;
+  uint32_t compute_pgm_rsrc_2;
+  uint32_t flags;
+  uint32_t wi_private_segment_byte_size;
+  uint32_t wg_group_segment_byte_size;
+  uint32_t gds_segment_byte_size;
+  uint64_t kernarg_segment_byte_size;
+  uint32_t wg_fbarrier_count;
+  uint16_t wg_sgpr_count;
+  uint16_t wi_vgpr_count;
+  uint16_t reserved_vgpr_first;
+  uint16_t reserved_vgpr_count;
+  uint16_t reserved_sgpr_first;
+  uint16_t reserved_sgpr_count;
+  uint16_t debug_wf_private_segment_offset_sgpr;
+  uint16_t debuf_private_segment_buffer_sgpr;
+  uint8_t kernarg_segment_alignment;
+  uint8_t group_segment_alignment;
+  uint8_t private_segment_alignment;
+  uint8_t wavefront_size;
+  uint32_t call_convention;
+  uint8_t reserved[12];
+  uint64_t runtime_loader_kernel_symbol;
+  uint8_t control_directive[128];
+};
+
 struct CodeObject {
-  void* ptr;
+  struct HSACodeObjectHeader* ptr;
   size_t size;
 };
 

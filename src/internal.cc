@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "src/client.h"
+#include "src/elf.h"
 #include "src/util.h"
 
 void __hipDumpCodeObject(const std::string& image) {
@@ -83,46 +84,41 @@ extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
   return modules;
 }
 
+void getKernelArgumentMetaData(elfio::File* elf) {
+  auto note_section = elf->GetSectionByType("SHT_NOTE");
+  if (!note_section) {
+    panic("note section is not found");
+  }
+
+  char* blog = note_section->Blob();
+  int offset = 0;
+  while (offset < note_section->size) {
+    auto note = std::make_unique<elfio::Note>(elf, blog + offset);
+
+    std::cout << "Note " << note->name << ": " << note->desc << std::endl;
+
+    offset += note->TotalSize();
+  }
+}
+
 std::unique_ptr<struct CodeObject> getCodeObject(hipModule_t module,
                                                  char* function_name) {
   char* elf_ptr = reinterpret_cast<char*>(module->executable.handle);
-  Elf64_Ehdr* ehdr = reinterpret_cast<Elf64_Ehdr*>(elf_ptr);
-  Elf64_Shdr* shdr = reinterpret_cast<Elf64_Shdr*>(elf_ptr + ehdr->e_shoff);
+  elfio::File elf_file = elfio::File::FromMem(elf_ptr);
 
-  Elf64_Shdr* sh_strtab = &shdr[ehdr->e_shstrndx];
-  const char* const sh_strtab_p = elf_ptr + sh_strtab->sh_offset;
-
-  Elf64_Shdr* symbol_table_section;
-  Elf64_Shdr* symbol_string_table_section;
-  for (int i = 0; i < ehdr->e_shnum; i++) {
-    auto section_name = std::string(sh_strtab_p + shdr[i].sh_name);
-
-    if (shdr[i].sh_type == SHT_SYMTAB) {
-      symbol_table_section = &shdr[i];
-    }
-
-    if ((shdr[i].sh_type == SHT_STRTAB) && (section_name == ".strtab")) {
-      symbol_string_table_section = &shdr[i];
-    }
-  }
-  const char* const strtab_p = elf_ptr + symbol_string_table_section->sh_offset;
-
-  auto total_syms = symbol_table_section->sh_size / sizeof(Elf64_Sym);
-  auto syms_data =
-      reinterpret_cast<Elf64_Sym*>(elf_ptr + symbol_table_section->sh_offset);
-
-  for (int i = 0; i < total_syms; i++) {
-    auto name = std::string(strtab_p + syms_data[i].st_name);
-    if (name == std::string(function_name)) {
-      auto co = std::make_unique<struct CodeObject>();
-      co->ptr = reinterpret_cast<void*>(elf_ptr + syms_data[i].st_value);
-      co->size = syms_data[i].st_size;
-      return std::move(co);
-    }
+  auto symbol = elf_file.GetSymbolByName(function_name);
+  if (!symbol) {
+    panic("function not found");
+    return nullptr;
   }
 
-  panic("function not found");
-  return nullptr;
+  auto co = std::make_unique<struct CodeObject>();
+  co->ptr = reinterpret_cast<struct HSACodeObjectHeader*>(symbol->Blob());
+  co->size = symbol->size;
+
+  getKernelArgumentMetaData(&elf_file);
+
+  return std::move(co);
 }
 
 extern "C" void __hipRegisterFunction(

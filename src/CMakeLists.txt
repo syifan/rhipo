@@ -15,6 +15,8 @@ set(SRC
     curl.h
     curl.cc
     device.cc
+    elf.h
+    elf.cc
     internal.h
     internal.cc
     kernel.cc
