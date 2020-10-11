@@ -70,6 +70,7 @@ class Note {
 
   std::string name;
   std::string desc;
+  uint32_t desc_size;
   uint32_t type;
 
  private:

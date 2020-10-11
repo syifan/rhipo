@@ -139,6 +139,7 @@ char *Symbol::Blob() {
 Note::Note(File *file, char *header)
     : file(file), header(reinterpret_cast<Elf64_Nhdr *>(header)) {
   this->type = this->header->n_type;
+  this->desc_size = this->header->n_descsz;
   this->name =
       std::string{this->Blob() + sizeof(Elf64_Nhdr), this->header->n_namesz};
   this->desc =

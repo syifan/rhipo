@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "msgpack/msgpack.hpp"
 #include "src/client.h"
 #include "src/elf.h"
 #include "src/util.h"
@@ -96,6 +97,12 @@ void getKernelArgumentMetaData(elfio::File* elf) {
     auto note = std::make_unique<elfio::Note>(elf, blog + offset);
 
     std::cout << "Note " << note->name << ": " << note->desc << std::endl;
+
+    auto object_handle =
+        msgpack::unpack(note->desc.c_str() + 1, note->desc_size);
+    auto obj = object_handle.get();
+
+    std::cout << obj << std::endl;
 
     offset += note->TotalSize();
   }
