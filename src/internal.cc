@@ -95,16 +95,15 @@ void getKernelArgumentMetaData(elfio::File* elf) {
   int offset = 0;
   while (offset < note_section->size) {
     auto note = std::make_unique<elfio::Note>(elf, blog + offset);
-
-    std::cout << "Note " << note->name << ": " << note->desc << std::endl;
-
-    auto object_handle =
-        msgpack::unpack(note->desc.c_str() + 1, note->desc_size);
-    auto obj = object_handle.get();
-
-    std::cout << obj << std::endl;
-
     offset += note->TotalSize();
+
+    if (note->name.rfind("AMDGPU") == 0) {
+      auto object_handle =
+          msgpack::unpack(note->desc.c_str() + 1, note->desc_size);
+      auto obj = object_handle.get();
+
+      std::cout << "Note " << note->name << ": " << obj << std::endl;
+    }
   }
 }
 
