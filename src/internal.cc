@@ -74,7 +74,7 @@ extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
       __hipDumpCodeObject(image);
 
       module->executable = hsa_executable_t();
-      module->executable.handle = reinterpret_cast<uint64_t>(image.c_str());
+      module->executable.handle = reinterpret_cast<uint64_t>(image_ptr);
 
       modules->at(device_id - 1) = module;
     }
@@ -93,18 +93,26 @@ std::unique_ptr<struct CodeObject> getCodeObject(hipModule_t module,
   const char* const sh_strtab_p = elf_ptr + sh_strtab->sh_offset;
 
   Elf64_Shdr* symbol_table_section;
+  Elf64_Shdr* symbol_string_table_section;
   for (int i = 0; i < ehdr->e_shnum; i++) {
+    auto section_name = std::string(sh_strtab_p + shdr[i].sh_name);
+
     if (shdr[i].sh_type == SHT_SYMTAB) {
       symbol_table_section = &shdr[i];
     }
+
+    if ((shdr[i].sh_type == SHT_STRTAB) && (section_name == ".strtab")) {
+      symbol_string_table_section = &shdr[i];
+    }
   }
+  const char* const strtab_p = elf_ptr + symbol_string_table_section->sh_offset;
 
   auto total_syms = symbol_table_section->sh_size / sizeof(Elf64_Sym);
   auto syms_data =
       reinterpret_cast<Elf64_Sym*>(elf_ptr + symbol_table_section->sh_offset);
 
   for (int i = 0; i < total_syms; i++) {
-    auto name = std::string(sh_strtab_p + syms_data[i].st_name);
+    auto name = std::string(strtab_p + syms_data[i].st_name);
     if (name == std::string(function_name)) {
       auto co = std::make_unique<struct CodeObject>();
       co->ptr = reinterpret_cast<void*>(elf_ptr + syms_data[i].st_value);
@@ -136,6 +144,10 @@ extern "C" hipError_t __hipPushCallConfiguration(dim3 gridDim, dim3 blockDim,
                                                  size_t sharedMem,
                                                  hipStream_t stream) {
   printf("%s\n", __PRETTY_FUNCTION__);
+
+  Client::instance.config =
+      CallConfiguration{gridDim, blockDim, sharedMem, stream};
+
   return hipSuccess;
 }
 
@@ -143,5 +155,12 @@ extern "C" hipError_t __hipPopCallConfiguration(dim3* gridDim, dim3* blockDim,
                                                 size_t* sharedMem,
                                                 hipStream_t* stream) {
   printf("%s\n", __PRETTY_FUNCTION__);
+
+  auto config = Client::instance.config;
+  *gridDim = config.gridDim;
+  *blockDim = config.blockDim;
+  *sharedMem = config.sharedMem;
+  *stream = config.stream;
+
   return hipSuccess;
 }
