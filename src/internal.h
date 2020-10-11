@@ -38,6 +38,11 @@ struct __CudaFatBinaryWrapper {
   void* unused;
 };
 
+struct CodeObject {
+  void* ptr;
+  size_t size;
+};
+
 struct ihipModule_t {
   std::string fileName;
   hsa_executable_t executable = {};

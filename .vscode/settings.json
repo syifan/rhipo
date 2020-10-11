@@ -1,10 +1,12 @@
 {
     "files.associations": {
-        "vector": "cpp"
+        "vector": "cpp",
+        "new": "cpp"
     },
     "editor.formatOnSave": true,
     "cpplint.excludes": [
         "include/",
+        "src/elf/"
     ],
     "cpplint.filters": [
         "-legal/copyright"

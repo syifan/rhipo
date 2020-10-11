@@ -1,0 +1,37 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Yifan Lowfreq vectorAdd",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/yifan/dev/src/github.com/ROCm-Developer-Tools/HIP-Examples/vectorAdd/vectoradd_hip.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name":"RHIPO_SERVER_URL",
+                    "value":"lowfreq.ece.neu.edu:8080",
+                },
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/home/yifan/dev/src/github.com/syifan/rhipo/build/lib/",
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+       
+    ]
+}
