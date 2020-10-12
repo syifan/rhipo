@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+#include "nlohmann/json.hpp"
+
 // hip-clang fatbin format
 constexpr unsigned __hipFatMAGIC2 = 0x48495046;  // "HIPF"
 
@@ -76,8 +78,9 @@ struct HSACodeObjectHeader {
 };
 
 struct CodeObject {
-  struct HSACodeObjectHeader* ptr;
+  void* ptr;
   size_t size;
+  nlohmann::json note;
 };
 
 struct ihipModule_t {

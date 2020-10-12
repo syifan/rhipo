@@ -85,7 +85,7 @@ extern "C" std::vector<hipModule_t>* __hipRegisterFatBinary(const void* data) {
   return modules;
 }
 
-void getKernelArgumentMetaData(elfio::File* elf) {
+nlohmann::json getKernelArgumentMetaData(elfio::File* elf) {
   auto note_section = elf->GetSectionByType("SHT_NOTE");
   if (!note_section) {
     panic("note section is not found");
@@ -99,10 +99,12 @@ void getKernelArgumentMetaData(elfio::File* elf) {
 
     if (note->name.rfind("AMDGPU") == 0) {
       auto json = nlohmann::json::from_msgpack(note->desc);
-
-      std::cout << "Note " << note->name << ": " << json << std::endl;
+      return json;
     }
   }
+
+  panic("note not found");
+  return nlohmann::json();
 }
 
 std::unique_ptr<struct CodeObject> getCodeObject(hipModule_t module,
@@ -117,10 +119,9 @@ std::unique_ptr<struct CodeObject> getCodeObject(hipModule_t module,
   }
 
   auto co = std::make_unique<struct CodeObject>();
-  co->ptr = reinterpret_cast<struct HSACodeObjectHeader*>(symbol->Blob());
+  co->ptr = reinterpret_cast<void*>(symbol->Blob());
   co->size = symbol->size;
-
-  getKernelArgumentMetaData(&elf_file);
+  co->note = getKernelArgumentMetaData(&elf_file);
 
   return std::move(co);
 }
