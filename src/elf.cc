@@ -140,11 +140,17 @@ Note::Note(File *file, char *header)
     : file(file), header(reinterpret_cast<Elf64_Nhdr *>(header)) {
   this->type = this->header->n_type;
   this->desc_size = this->header->n_descsz;
-  this->name =
-      std::string{this->Blob() + sizeof(Elf64_Nhdr), this->header->n_namesz};
-  this->desc =
-      std::string{this->Blob() + sizeof(Elf64_Nhdr) + this->header->n_namesz,
-                  this->header->n_descsz};
+
+  auto name_ptr = this->Blob() + sizeof(Elf64_Nhdr);
+  this->name = std::string{name_ptr, this->header->n_namesz};
+
+  int desc_ptr_align = 4;
+  int desc_offset = sizeof(Elf64_Nhdr) + this->header->n_namesz;
+  if (desc_offset % desc_ptr_align != 0) {
+    desc_offset += desc_ptr_align - desc_offset % desc_ptr_align;
+  }
+  auto desc_ptr = this->Blob() + desc_offset;
+  this->desc = std::string{desc_ptr, this->header->n_descsz};
 }
 
 char *Note::Blob() { return reinterpret_cast<char *>(this->header); }

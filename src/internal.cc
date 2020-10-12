@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-#include "msgpack/msgpack.hpp"
+#include "nlohmann/json.hpp"
 #include "src/client.h"
 #include "src/elf.h"
 #include "src/util.h"
@@ -98,11 +98,9 @@ void getKernelArgumentMetaData(elfio::File* elf) {
     offset += note->TotalSize();
 
     if (note->name.rfind("AMDGPU") == 0) {
-      auto object_handle =
-          msgpack::unpack(note->desc.c_str() + 1, note->desc_size);
-      auto obj = object_handle.get();
+      auto json = nlohmann::json::from_msgpack(note->desc);
 
-      std::cout << "Note " << note->name << ": " << obj << std::endl;
+      std::cout << "Note " << note->name << ": " << json << std::endl;
     }
   }
 }
