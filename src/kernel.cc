@@ -1,5 +1,6 @@
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>
+#include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -48,6 +49,8 @@ struct HSACodeObjectHeader NoteToHeader(CodeObject* co) {
   computePgmRsc2.EnableWorkGroupIDX();
   computePgmRsc2.EnableWorkGroupIDY();
   computePgmRsc2.EnableWorkGroupIDZ();
+  computePgmRsc2.EnableWorkItemIDY();
+  computePgmRsc2.EnableWorkItemIDZ();
   header.compute_pgm_rsrc_2 = computePgmRsc2.Get();
 
   auto flags = Flags();
@@ -84,16 +87,23 @@ std::string EncodeArgs(const void* func_addr, void** args) {
   std::vector<char> arg_segment(arg_segment_size);
 
   int ptr = 0;
-  for (int i = 0; i < kernel_note["args"].size(); i++) {
-    auto arg_note = kernel_note["args"][i];
+  int num_args = kernel_note[".args"].size();
 
-    int size = arg_note["size"].get<int>();
+  printf("%d, %s\n", num_args, kernel_note[".args"].dump().c_str());
+  for (int i = 0; i < num_args - 6; i++) {
+    auto arg_note = kernel_note[".args"][i];
+    printf("%d, %s, %p\n", i, kernel_note[".args"][i].dump().c_str(), args[i]);
+
+    int size = arg_note[".size"].get<int>();
     memcpy(arg_segment.data() + ptr, args[i], size);
+
     ptr += size;
   }
 
   auto encoded_args =
       base64_encode(std::string{arg_segment.data(), arg_segment.size()});
+
+  printf("encoded args: %s\n", encoded_args.c_str());
 
   return encoded_args;
 }
