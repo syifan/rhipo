@@ -8,7 +8,7 @@
 
 hipError_t hipGetDeviceCount(int* count) {
   nlohmann::json param = nlohmann::json::object();
-  auto rsp = Client::instance.Curl.Get("/device_count", param);
+  auto rsp = Client::instance.curl.Get("/device_count", param);
 
   *count = rsp["device_count"];
 
@@ -17,7 +17,7 @@ hipError_t hipGetDeviceCount(int* count) {
 
 hipError_t hipGetDeviceProperties(hipDeviceProp_t* props, int device) {
   nlohmann::json param = nlohmann::json::object();
-  auto rsp = Client::instance.Curl.Get(
+  auto rsp = Client::instance.curl.Get(
       "/device_properties/" + std::to_string(device), param);
 
   strncpy(props->name, rsp["name"].get<std::string>().c_str(), 256);

@@ -10,6 +10,19 @@ Assuming you are using ubuntu, you need to install the following packages.
 
 - libcurl-dev
 
+### Build
+
+Run the following command to build the library.
+
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+```
+
+The library will appear under `build/lib`
+
 ## How to use
 
 - Start the MGPUSim server.

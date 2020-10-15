@@ -14,10 +14,11 @@ struct CallConfiguration {
   size_t sharedMem;
   hipStream_t stream;
 };
+
 class Client {
  public:
   static Client instance;
-  Curl Curl;
+  Curl curl;
 
   std::unordered_map<const void*, std::unique_ptr<struct CodeObject>>
       function_map;

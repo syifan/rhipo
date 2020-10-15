@@ -129,7 +129,7 @@ hipError_t hipLaunchKernel(const void* func_addr, dim3 numBlocks,
   params["dim_blocks"] = Dim3ToJson(dimBlocks);
   params["shared_mem_bytes"] = sharedMemBytes;
 
-  Client::instance.Curl.Post("/launch_kernel", params);
+  Client::instance.curl.Post("/launch_kernel", params);
 
   return hipSuccess;
 }

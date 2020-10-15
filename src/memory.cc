@@ -9,7 +9,7 @@ hipError_t hipMalloc(void** ptr, size_t sizeBytes) {
   nlohmann::json param = nlohmann::json::object();
   param["size"] = sizeBytes;
 
-  auto rsp = Client::instance.Curl.Get("/malloc", param);
+  auto rsp = Client::instance.curl.Get("/malloc", param);
 
   *ptr = reinterpret_cast<void*>(rsp["ptr"].get<uintptr_t>());
 
@@ -26,7 +26,7 @@ hipError_t memcopyH2D(void* dst, const void* src, size_t sizeBytes) {
   param["ptr"] = reinterpret_cast<uintptr_t>(dst);
   param["data"] = b64_data;
 
-  auto rsp = Client::instance.Curl.Post("/memcopy_h2d", param);
+  auto rsp = Client::instance.curl.Post("/memcopy_h2d", param);
 
   return hipSuccess;
 }
@@ -36,7 +36,7 @@ hipError_t memcopyD2H(void* dst, const void* src, size_t sizeBytes) {
   param["ptr"] = reinterpret_cast<uintptr_t>(src);
   param["size"] = sizeBytes;
 
-  auto rsp = Client::instance.Curl.Get("/memcopy_d2h", param);
+  auto rsp = Client::instance.curl.Get("/memcopy_d2h", param);
 
   auto b64_data = rsp["data"].get<std::string>();
   auto raw_data = base64_decode(b64_data);
@@ -65,7 +65,7 @@ hipError_t hipFree(void* ptr) {
 
   std::string url = "/free/" + std::to_string(reinterpret_cast<uintptr_t>(ptr));
 
-  auto rsp = Client::instance.Curl.Get("/free/", param);
+  auto rsp = Client::instance.curl.Get("/free/", param);
 
   return hipSuccess;
 }
