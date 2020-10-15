@@ -130,7 +130,6 @@ extern "C" void __hipRegisterFunction(
     std::vector<hipModule_t>* modules, const void* hostFunction,
     char* deviceFunction, const char* deviceName, unsigned int threadLimit,
     uint3* tid, uint3* bid, dim3* blockDim, dim3* gridDim, int* wSize) {
-  printf("%s\n", __PRETTY_FUNCTION__);
   auto module = modules->at(0);
   auto co = getCodeObject(module, deviceFunction);
   Client::instance.function_map[hostFunction] = std::move(co);

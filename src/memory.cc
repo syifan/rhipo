@@ -6,8 +6,6 @@
 #include "src/util.h"
 
 hipError_t hipMalloc(void** ptr, size_t sizeBytes) {
-  printf("%s\n", __PRETTY_FUNCTION__);
-
   nlohmann::json param = nlohmann::json::object();
   param["size"] = sizeBytes;
 
@@ -50,8 +48,6 @@ hipError_t memcopyD2H(void* dst, const void* src, size_t sizeBytes) {
 
 hipError_t hipMemcpy(void* dst, const void* src, size_t sizeBytes,
                      hipMemcpyKind kind) {
-  printf("%s\n", __PRETTY_FUNCTION__);
-
   switch (kind) {
     case hipMemcpyHostToDevice:
       return memcopyH2D(dst, src, sizeBytes);
@@ -65,6 +61,11 @@ hipError_t hipMemcpy(void* dst, const void* src, size_t sizeBytes,
 }
 
 hipError_t hipFree(void* ptr) {
-  printf("%s\n", __PRETTY_FUNCTION__);
+  nlohmann::json param = nlohmann::json::object();
+
+  std::string url = "/free/" + std::to_string(reinterpret_cast<uintptr_t>(ptr));
+
+  auto rsp = Client::instance.Curl.Get("/free/", param);
+
   return hipSuccess;
 }

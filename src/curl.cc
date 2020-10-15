@@ -28,7 +28,7 @@ nlohmann::json Curl::Get(const std::string &url, const nlohmann::json &params) {
   auto data_str = params.dump();
   auto full_url = this->url + url + "?data=" + data_str;
 
-  printf("\nGET %s\n", full_url.c_str());
+  // printf("\nGET %s\n", full_url.c_str());
 
   curl_easy_setopt(this->curl, CURLOPT_URL, full_url.c_str());
   curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, NULL);
@@ -38,7 +38,7 @@ nlohmann::json Curl::Get(const std::string &url, const nlohmann::json &params) {
 
   curl_easy_perform(this->curl);
 
-  printf("\t%s\n\n", rsp.c_str());
+  // printf("\t%s\n\n", rsp.c_str());
 
   return nlohmann::json::parse(rsp);
 }
@@ -50,8 +50,8 @@ nlohmann::json Curl::Post(const std::string &url,
   auto data_str = params.dump();
   auto full_url = this->url + url;
 
-  printf("\nPOST %s\n", full_url.c_str());
-  printf("\tbody: %s\n", data_str.c_str());
+  // printf("\nPOST %s\n", full_url.c_str());
+  // printf("\tbody: %s\n", data_str.c_str());
 
   curl_easy_setopt(this->curl, CURLOPT_URL, full_url.c_str());
   curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, data_str.c_str());
@@ -60,7 +60,7 @@ nlohmann::json Curl::Post(const std::string &url,
 
   curl_easy_perform(this->curl);
 
-  printf("\t%s\n\n", rsp.c_str());
+  // printf("\t%s\n\n", rsp.c_str());
 
   return nlohmann::json::parse(rsp);
 }
